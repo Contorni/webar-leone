@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>WebAR Leone</title>
+    <!-- Librerie Three.js e AR.js -->
+    <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js/three.js/build/ar.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <!-- Container per la scena AR -->
+    <div style="position: absolute; width: 100%; height: 100%;" id="ar-container"></div>
+
+    <script>
+      // Inizializza la scena, la fotocamera e il renderer
+      var scene = new THREE.Scene();
+      var camera = new THREE.Camera();
+      scene.add(camera);
+
+      var renderer = new THREE.WebGLRenderer({ alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.getElementById('ar-container').appendChild(renderer.domElement);
+
+      // Aggiungi la sorgente AR.js
+      var arSource = new THREEx.ArToolkitSource({
+        sourceType: 'webcam',
+      });
+
+      arSource.init(function onReady() {
+        arSource.onResizeElement();
+        arSource.copyElementSizeTo(renderer.domElement);
+        arSource.copyElementSizeTo(document.body);
+      });
+
+      // Configura AR.js
+      var arContext = new THREEx.ArToolkitContext({
+        cameraParametersUrl: 'https://cdn.rawgit.com/jeromeetienne/ar.js/master/data/camera_para.dat',
+        detectionMode: 'mono'
+      });
+
+      arContext.init(function onCompleted() {
+        camera.projectionMatrix.copy(arContext.getProjectionMatrix());
+      });
+
+      // Aggiungi il marker
+      var markerControls = new THREEx.ArMarkerControls(arContext, camera, {
+        type: 'pattern',
+        patternUrl: 'https://cdn.rawgit.com/jeromeetienne/ar.js/master/data/patt.hiro',
+        changeMatrixMode: 'modelViewMatrix'
+      });
+
+      // Carica il modello del leone
+      var loader = new THREE.GLTFLoader();
+      loader.load('leone.glb', function (gltf) {
+        var model = gltf.scene;
+        model.scale.set(0.1, 0.1, 0.1);  // Riduce la scala del modello
+        scene.add(model);
+      });
+
+      // Ciclo di rendering
+      var animate = function () {
+        requestAnimationFrame(animate);
+        if (arContext.arController !== null) {
+          arContext.update(arSource.domElement);
+        }
+        renderer.render(scene, camera);
+      };
+
+      animate();
+    </script>
+  </body>
+</html>
