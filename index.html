@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebXR AR Test</title>
+    <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/3.3.2/aframe/build/aframe-ar.js"></script>
+    <style>
+        body { margin: 0; }
+        canvas { width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+    <a-scene embedded arjs="sourceType: webcam;">
+        <a-box position="0 0.5 0" material="color: blue;"></a-box>
+        <a-entity camera></a-entity>
+    </a-scene>
+    
+    <script>
+        // Aggiungere log per il caricamento
+        console.log("Inizializzazione della scena AR");
+    </script>
+</body>
+</html>
